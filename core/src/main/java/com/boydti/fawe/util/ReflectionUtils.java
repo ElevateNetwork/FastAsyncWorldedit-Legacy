@@ -111,7 +111,7 @@ public class ReflectionUtils {
         parms[0] = value;
         parms[1] = Integer.valueOf(ordinal);
         System.arraycopy(additionalValues, 0, parms, 2, additionalValues.length);
-        return enumClass.cast(getConstructorAccessor(enumClass, additionalTypes).newInstance(parms));
+        return enumClass.getConstructor(additionalTypes).newInstance(parms);
     }
 
     private static ConstructorAccessor getConstructorAccessor(Class<?> enumClass,

@@ -24,12 +24,13 @@ import com.sk89q.worldedit.WorldEditException;
 import jdk.nashorn.api.scripting.NashornScriptEngineFactory;
 
 import javax.script.ScriptEngine;
+import javax.script.ScriptEngineManager;
 import javax.script.ScriptException;
 import javax.script.SimpleBindings;
 import java.util.Map;
 
 public class NashornCraftScriptEngine implements CraftScriptEngine {
-    private static NashornScriptEngineFactory FACTORY;
+    private static ScriptEngineManager FACTORY;
     private int timeLimit;
 
     @Override
@@ -47,19 +48,19 @@ public class NashornCraftScriptEngine implements CraftScriptEngine {
         ClassLoader cl = Fawe.get().getClass().getClassLoader();
         Thread.currentThread().setContextClassLoader(cl);
         synchronized (NashornCraftScriptEngine.class) {
-            if (FACTORY == null) FACTORY = new NashornScriptEngineFactory();
+            if (FACTORY == null) FACTORY = new ScriptEngineManager();
         }
         ;
-        ScriptEngine engine = FACTORY.getScriptEngine("--language=es6");
+        ScriptEngine engine = FACTORY.getEngineByName("javascript");
         SimpleBindings bindings = new SimpleBindings();
 
         for (Map.Entry<String, Object> entry : args.entrySet()) {
             bindings.put(entry.getKey(), entry.getValue());
         }
 
-       try {
-           Object result = engine.eval(script, bindings);
-           return result;
+        try {
+            Object result = engine.eval(script, bindings);
+            return result;
         } catch (Error e) {
             e.printStackTrace();
             throw new ScriptException(e.getMessage());

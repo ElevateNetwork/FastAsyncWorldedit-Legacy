@@ -39,7 +39,7 @@ public class Settings extends Config {
             "To be allowed to WorldEdit in a region, users need the appropriate",
             "fawe.<plugin>  permission. See the Permissions page for supported region plugins."
     })
-    public boolean REGION_RESTRICTIONS = true;
+    public boolean REGION_RESTRICTIONS = false;
     @Comment("FAWE will skip chunks when there's not enough memory available")
     public boolean PREVENT_CRASHES = false;
     @Comment({

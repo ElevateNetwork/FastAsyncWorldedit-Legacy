@@ -126,41 +126,12 @@ public class WorldEditCommands {
     )
     @CommandPermissions("worldedit.changelog")
     public void changelog(Actor actor) throws WorldEditException {
-        try {
-            String changes = null;
-
-            String url = "https://athion.net/fawe/cl?" + Integer.toHexString(Fawe.get().getVersion().hash);
-            if (changes == null) {
-                try (Scanner scanner = new Scanner(new URL(url).openStream(), "UTF-8")) {
-                    changes = scanner.useDelimiter("\\A").next();
-                }
-            }
-            changes = changes.replaceAll("#([0-9]+)", "github.com/boy0001/FastAsyncWorldedit/issues/$1");
-
-            String[] split = changes.substring(1).split("[\n](?! )");
-            if (changes.length() <= 1) actor.print(BBC.getPrefix() + "No description available");
-            else {
-                StringBuilder msg = new StringBuilder();
-                msg.append(BBC.getPrefix() + split.length + " commits:");
-                for (String change : split) {
-                    String[] split2 = change.split("\n    ");
-                    msg.append("\n&a&l" + split2[0]);
-                    if (split2.length != 0) {
-                        for (int i = 1; i < split2.length; i++) {
-                            msg.append('\n');
-                            String[] split3 = split2[i].split("\n");
-                            String subChange = "&8 - &7" + StringMan.join(split3, "\n&7   ");
-                            msg.append(subChange);
-                        }
-                    }
-                }
-                msg.append("\n&7More info: &9&o" + url);
-                msg.append("\n&7Discuss: &9&ohttps://discord.gg/ngZCzbU");
-                actor.print(BBC.color(msg.toString()));
-            }
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
+        actor.print(String.join("\n", Arrays.asList(
+                "-------------------------------------------",
+                "This is an unofficial build of FAWE",
+                "FAWE Legacy is no longer maintained",
+                "-------------------------------------------"
+        )));
     }
 
     @Command(

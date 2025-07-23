@@ -145,7 +145,6 @@ public class Fawe {
     private final FaweTimer timer;
     private FaweVersion version;
     private VisualQueue visualQueue;
-    private Updater updater;
     private TextureUtil textures;
     private DefaultTransformParser transformParser;
     private ChatManager chatManager = new PlainChatManager();
@@ -286,13 +285,6 @@ public class Fawe {
         }, 0);
 
         TaskManager.IMP.repeat(timer, 1);
-
-        if (!Settings.IMP.UPDATE.equalsIgnoreCase("false")) {
-            // Delayed updating
-            updater = new Updater();
-            TaskManager.IMP.async(() -> update());
-            TaskManager.IMP.repeatAsync(() -> update(), 36000);
-        }
     }
 
     public void onDisable() {
@@ -302,10 +294,6 @@ public class Fawe {
     }
 
     private boolean update() {
-        if (updater != null) {
-            updater.getUpdate(IMP.getPlatform(), getVersion());
-            return true;
-        }
         return false;
     }
 
@@ -344,16 +332,6 @@ public class Fawe {
 
     public DefaultTransformParser getTransformParser() {
         return transformParser;
-    }
-
-    /**
-     * The FAWE updater class
-     * - Use to get basic update information (changelog/version etc)
-     *
-     * @return
-     */
-    public Updater getUpdater() {
-        return updater;
     }
 
     public TextureUtil getCachedTextureUtil(boolean randomize, int min, int max) {

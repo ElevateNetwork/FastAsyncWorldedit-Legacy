@@ -122,8 +122,8 @@ public class GenerationCommands extends MethodCommands {
     public void image(Player player, LocalSession session, EditSession editSession, String arg, @Optional("true") boolean randomize, @Optional("100") int threshold, @Optional Vector2D dimensions) throws WorldEditException, ParameterException, IOException {
         TextureUtil tu = Fawe.get().getCachedTextureUtil(randomize, 0, threshold);
         URL url = new URL(arg);
-        if (!url.getHost().equalsIgnoreCase("i.imgur.com") && !url.getHost().equalsIgnoreCase("empcraft.com")) {
-            throw new IOException("Only i.imgur.com or empcraft.com/ui links are allowed!");
+        if (!url.getHost().equalsIgnoreCase("i.imgur.com")) {
+            throw new IOException("Only i.imgur.com links are allowed!");
         }
         FawePlayer<Object> fp = FawePlayer.wrap(player);
         BufferedImage image = MainUtil.readImage(url);

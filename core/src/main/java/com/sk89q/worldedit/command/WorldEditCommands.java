@@ -72,14 +72,7 @@ public class WorldEditCommands {
             actor.printDebug(" - COMMIT: " + Integer.toHexString(version.hash));
             actor.printDebug(" - BUILD: #" + version.build);
             actor.printDebug(" - PLATFORM: " + Settings.IMP.PLATFORM);
-            Updater updater = Fawe.get().getUpdater();
-            if (updater == null) {
-                actor.printDebug(" - UPDATES: DISABLED");
-            } else if (updater.isOutdated()) {
-                actor.printDebug(" - UPDATES: " + updater.getChanges().split("\n").length + " (see /fawe cl)");
-            } else {
-                actor.printDebug(" - UPDATES: Latest Version");
-            }
+            actor.printDebug(" - UPDATES: Latest Version");
             actor.printDebug("------------------------------------");
         }
         actor.print(BBC.getPrefix() + "WorldEdit " + WorldEdit.getVersion() + " by sk89q");
@@ -121,15 +114,7 @@ public class WorldEditCommands {
             max = 0
     )
     public void update(FawePlayer fp) throws WorldEditException {
-        if (Fawe.get().getUpdater().installUpdate(fp)) {
-            TaskManager.IMP.sync(() -> {
-                fp.executeCommand("restart");
-                return null;
-            });
-            fp.sendMessage(BBC.getPrefix() + "Please restart to finish installing the update");
-        } else {
-            fp.sendMessage(BBC.getPrefix() + "No update is pending");
-        }
+        fp.sendMessage(BBC.getPrefix() + "No update is pending");
     }
 
     @Command(
@@ -142,10 +127,9 @@ public class WorldEditCommands {
     @CommandPermissions("worldedit.changelog")
     public void changelog(Actor actor) throws WorldEditException {
         try {
-            Updater updater = Fawe.get().getUpdater();
-            String changes = updater != null ? updater.getChanges() : null;
+            String changes = null;
 
-            String url = "https://empcraft.com/fawe/cl?" + Integer.toHexString(Fawe.get().getVersion().hash);
+            String url = "https://athion.net/fawe/cl?" + Integer.toHexString(Fawe.get().getVersion().hash);
             if (changes == null) {
                 try (Scanner scanner = new Scanner(new URL(url).openStream(), "UTF-8")) {
                     changes = scanner.useDelimiter("\\A").next();

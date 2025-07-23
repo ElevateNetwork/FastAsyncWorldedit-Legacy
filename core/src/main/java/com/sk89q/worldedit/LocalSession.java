@@ -36,7 +36,6 @@ import com.boydti.fawe.object.extent.ResettableExtent;
 import com.boydti.fawe.util.*;
 import com.boydti.fawe.util.cui.CUI;
 import com.boydti.fawe.wrappers.WorldWrapper;
-import com.intellectualcrafters.plot.object.PlotArea;
 import com.sk89q.jchronic.Chronic;
 import com.sk89q.jchronic.Options;
 import com.sk89q.jchronic.utils.Span;

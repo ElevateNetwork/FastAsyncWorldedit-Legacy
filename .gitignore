@@ -12,7 +12,7 @@
 /.idea
 *.log
 gradle.log
-/lib
+/libs
 /core/build
 /forge189/build
 /forge1710/build

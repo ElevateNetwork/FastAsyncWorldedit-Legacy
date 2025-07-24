@@ -445,6 +445,8 @@ public class Config {
     private void setAccessible(Field field) throws NoSuchFieldException, IllegalAccessException {
         field.setAccessible(true);
         if (Modifier.isFinal(field.getModifiers())) {
+            System.out.println("field name: " + field.getName());
+
             try {
                 Field lookupField = MethodHandles.Lookup.class.getDeclaredField("IMPL_LOOKUP");
                 lookupField.setAccessible(true);

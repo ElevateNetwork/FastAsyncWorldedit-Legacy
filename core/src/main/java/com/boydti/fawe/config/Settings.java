@@ -7,13 +7,13 @@ import java.util.*;
 
 public class Settings extends Config {
     @Ignore
-    public static final Settings IMP = new Settings();
+    public static Settings IMP = new Settings();
 
     @Comment("These first 6 aren't configurable") // This is a comment
     @Final // Indicates that this value isn't configurable
-    public final String ISSUES = "https://github.com/boy0001/FastAsyncWorldedit/issues";
+    public String ISSUES = "https://github.com/boy0001/FastAsyncWorldedit/issues";
     @Final
-    public final String WIKI = "https://github.com/boy0001/FastAsyncWorldedit/wiki/";
+    public String WIKI = "https://github.com/boy0001/FastAsyncWorldedit/wiki/";
     @Final
     public String DATE; // These values are set from FAWE before loading
     @Final

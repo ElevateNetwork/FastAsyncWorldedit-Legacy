@@ -33,7 +33,7 @@ public class Settings extends Config {
     })
     public String UPDATE = "confirm";
     @Comment("Send anonymous usage statistics")
-    public boolean METRICS = true;
+    public boolean METRICS = false;
     @Comment({
             "Set true to enable WorldEdit restrictions per region (e.g. PlotSquared or WorldGuard).",
             "To be allowed to WorldEdit in a region, users need the appropriate",

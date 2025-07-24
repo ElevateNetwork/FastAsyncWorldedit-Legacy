@@ -240,7 +240,7 @@ public class Fawe {
         if (Settings.IMP.METRICS) {
             try {
                 this.stats = new BStats();
-                this.IMP.startMetrics();
+                // this.IMP.startMetrics();
                 TaskManager.IMP.later(new Runnable() {
                     @Override
                     public void run() {

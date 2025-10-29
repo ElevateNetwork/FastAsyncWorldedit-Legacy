@@ -165,6 +165,10 @@ public class ForwardExtentCopy implements Operation {
         return copyBiomes;
     }
 
+    public void setCopyingBiomes(boolean copyBiomes) {
+        this.setCopyBiomes(copyBiomes);
+    }
+
     /**
      * Set a mask that gets applied to the source extent.
      *

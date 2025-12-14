@@ -39,6 +39,7 @@ import com.boydti.fawe.util.metrics.BStats;
 import com.sk89q.bukkit.util.FallbackRegistrationListener;
 import com.sk89q.worldedit.bukkit.BukkitPlayerBlockBag;
 import com.sk89q.worldedit.bukkit.BukkitWorld;
+import com.sk89q.worldedit.bukkit.CUIChannelListener;
 import com.sk89q.worldedit.bukkit.EditSessionBlockChangeDelegate;
 import com.sk89q.worldedit.bukkit.WorldEditPlugin;
 import com.sk89q.worldedit.world.World;
@@ -64,6 +65,8 @@ import org.bukkit.plugin.RegisteredServiceProvider;
 import org.primesoft.blockshub.BlocksHubBukkit;
 
 public class FaweBukkit implements IFawe, Listener {
+
+    public static final String CUI_PLUGIN_CHANNEL = "worldedit:cui";
 
     private final BukkitMain plugin;
     private VaultUtil vault;
@@ -128,6 +131,7 @@ public class FaweBukkit implements IFawe, Listener {
             } catch (Throwable ignore) {
                 ignore.printStackTrace();
             }
+            setupCUI();
         } catch (final Throwable e) {
             MainUtil.handleError(e);
             Bukkit.getServer().shutdown();
@@ -635,6 +639,15 @@ public class FaweBukkit implements IFawe, Listener {
             }
         }
         return tmp;
+    }
+
+    private void setupCUI() {
+        registerCUIAltChannel(getWorldEditPlugin());
+    }
+
+    private void registerCUIAltChannel(WorldEditPlugin owner) {
+        owner.getServer().getMessenger().registerIncomingPluginChannel(owner, CUI_PLUGIN_CHANNEL, new CUIChannelListener(owner));
+        owner.getServer().getMessenger().registerOutgoingPluginChannel(owner, CUI_PLUGIN_CHANNEL);
     }
 
     public enum Version {

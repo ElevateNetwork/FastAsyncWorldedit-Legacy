@@ -36,6 +36,7 @@ import com.sk89q.worldedit.internal.cui.CUIEvent;
 import com.sk89q.worldedit.session.SessionKey;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 import java.util.UUID;
 import javax.annotation.Nullable;
 import org.bukkit.*;
@@ -223,7 +224,10 @@ public class BukkitPlayer extends LocalPlayer {
         if (params.length > 0) {
             send = send + "|" + StringUtil.joinString(params, "|");
         }
-        player.sendPluginMessage(plugin, WorldEditPlugin.CUI_PLUGIN_CHANNEL, send.getBytes(CUIChannelListener.UTF_8_CHARSET));
+        String channel = Optional.of(FaweBukkit.CUI_PLUGIN_CHANNEL)
+                .filter(player.getListeningPluginChannels()::contains)
+                .orElse(WorldEditPlugin.CUI_PLUGIN_CHANNEL);
+        player.sendPluginMessage(plugin, channel, send.getBytes(CUIChannelListener.UTF_8_CHARSET));
     }
 
     public Player getPlayer() {

@@ -271,9 +271,18 @@ public class BukkitChunk_1_8 extends CharFaweChunk<Chunk, BukkitQueue18R3> {
                 }
             }
             if (toRemove != null) {
+                Map<Short, CompoundTag> incomingTiles = this.getTiles();
                 for (Map.Entry<BlockPosition, TileEntity> entry : toRemove.entrySet()) {
                     BlockPosition bp = entry.getKey();
                     TileEntity tile = entry.getValue();
+                    short hash = MathMan.tripleBlockCoord(bp.getX(), bp.getY(), bp.getZ());
+                    boolean replacing = incomingTiles.containsKey(hash);
+                    if (replacing) {
+                        // Keep existing TE; its tag will be overwritten in the set-tiles step below.
+                        // Removing-and-recreating corrupts ticking TEs (hopper/furnace) because the
+                        // old tile's deferred removal can drop the new TE too.
+                        continue;
+                    }
                     tiles.remove(bp);
                     nmsWorld.t(bp);
                     tile.y();

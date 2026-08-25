@@ -18,6 +18,8 @@ import com.sk89q.worldedit.world.biome.BaseBiome;
 import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.Field;
+import java.lang.reflect.Method;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
@@ -31,6 +33,7 @@ import java.util.WeakHashMap;
 import net.minecraft.server.v1_8_R3.Block;
 import net.minecraft.server.v1_8_R3.BlockPosition;
 import net.minecraft.server.v1_8_R3.Chunk;
+import net.minecraft.server.v1_8_R3.ChunkCoordIntPair;
 import net.minecraft.server.v1_8_R3.ChunkSection;
 import net.minecraft.server.v1_8_R3.Entity;
 import net.minecraft.server.v1_8_R3.EntityPlayer;
@@ -533,7 +536,22 @@ public class BukkitQueue18R3 extends BukkitQueue_0<net.minecraft.server.v1_8_R3.
             Object playerChunk = map.getEntry(pair);
             Field fieldPlayers = playerChunk.getClass().getDeclaredField("b");
             fieldPlayers.setAccessible(true);
-            Collection<EntityPlayer> players = (Collection<EntityPlayer>) fieldPlayers.get(playerChunk);
+            Collection<EntityPlayer> tracking = (Collection<EntityPlayer>) fieldPlayers.get(playerChunk);
+            if (tracking.isEmpty()) {
+                return;
+            }
+            // Tracking a chunk is not the same as having received it: the initial chunk packet is
+            // queued and only flushed a few chunks per tick. A player who is still waiting for that
+            // first packet would get this partial update and the tile entity packets below before
+            // any of the blocks exist on their side, which the 1.8 client reports as
+            // "Unable to locate sign at x, y, z". Those players are skipped here; their queued
+            // chunk packet carries the current contents and is followed by its own tile entities.
+            List<EntityPlayer> players = new ArrayList<>(tracking.size());
+            for (EntityPlayer player : tracking) {
+                if (hasReceivedChunk(player, x, z)) {
+                    players.add(player);
+                }
+            }
             if (players.isEmpty()) {
                 return;
             }
@@ -546,19 +564,26 @@ public class BukkitQueue18R3 extends BukkitQueue_0<net.minecraft.server.v1_8_R3.
                 }
             }
             // Send chunks
+            int sentMask = mask;
             if (mask == 0 || mask == 65535 && hasEntities(nmsChunk)) {
                 PacketPlayOutMapChunk packet = new PacketPlayOutMapChunk(nmsChunk, false, 65280);
                 for (EntityPlayer player : players) {
                     player.playerConnection.sendPacket(packet);
                 }
                 mask = 255;
+                sentMask = 65535;
             }
             PacketPlayOutMapChunk packet = new PacketPlayOutMapChunk(nmsChunk, false, mask);
             for (EntityPlayer player : players) {
                 player.playerConnection.sendPacket(packet);
             }
-            // Send tiles
+            // Send tiles, but only for the sections this update actually contained. The client
+            // still holds the correct tile entities for every section that was left out.
             for (Map.Entry<BlockPosition, TileEntity> entry : nmsChunk.getTileEntities().entrySet()) {
+                int section = entry.getKey().getY() >> 4;
+                if (section < 0 || section >= sections.length || (sentMask & (1 << section)) == 0) {
+                    continue;
+                }
                 TileEntity tile = entry.getValue();
                 Packet tilePacket = tile.getUpdatePacket();
                 for (EntityPlayer player : players) {
@@ -576,6 +601,40 @@ public class BukkitQueue18R3 extends BukkitQueue_0<net.minecraft.server.v1_8_R3.
             e.printStackTrace();
         } catch (NoSuchFieldException e) {
             e.printStackTrace();
+        }
+    }
+
+    private static volatile boolean hasSentChunkResolved;
+    private static volatile Method methodHasSentChunk;
+
+    /**
+     * Whether the initial chunk packet for this chunk already reached the client. RivalsSpigot
+     * tracks this per player; on other 1.8 servers fall back to the pending send queue.
+     */
+    private static boolean hasReceivedChunk(EntityPlayer player, int x, int z) {
+        try {
+            if (!hasSentChunkResolved) {
+                try {
+                    methodHasSentChunk = EntityPlayer.class
+                            .getMethod("hasSentChunk", int.class, int.class);
+                } catch (NoSuchMethodException ignored) {
+                    methodHasSentChunk = null;
+                }
+                hasSentChunkResolved = true;
+            }
+            Method method = methodHasSentChunk;
+            if (method != null) {
+                return (Boolean) method.invoke(player, x, z);
+            }
+            for (ChunkCoordIntPair queued : player.chunkCoordIntPairQueue) {
+                if (queued != null && queued.x == x && queued.z == z) {
+                    return false;
+                }
+            }
+            return true;
+        } catch (Throwable ignored) {
+            // Never let the lookup stop the refresh itself
+            return true;
         }
     }
 

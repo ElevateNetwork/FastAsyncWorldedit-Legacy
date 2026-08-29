@@ -60,11 +60,11 @@ final class LightEngine {
 
     static {
         Arrays.fill(LIGHT_OPACITY, (byte) 1);
-        for (IBlockData ibd : Block.d) {
+        for (int i = 0; i < STATE_COUNT; ++i) {
+            IBlockData ibd = Block.d.a(i);
             if (ibd == null) {
                 continue;
             }
-            int i = Block.getCombinedId(ibd);
             int emission = 0, opacity = 1;
             Block blk = ibd.getBlock();
             emission = blk.r();
